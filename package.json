@@ -1,0 +1,13 @@
+{
+  "name": "silverstrike",
+  "version": "1.0.0",
+  "description": "SilverStrike — on-chain idle clicker on LiteForge (LitVM)",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
