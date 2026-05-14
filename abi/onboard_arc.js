@@ -29,8 +29,7 @@ let _id = 1;
 async function rpc(method, params = []) {
   const urls = [
     process.env.RPC_URL,
-    'https://rpc.arc.network',
-    'https://rpc2.arc.network',
+    'https://rpc.testnet.arc.network',
   ].filter(Boolean);
 
   let lastErr;
@@ -64,14 +63,14 @@ const upstashGet = async (key) => {
 };
 
 const upstashSet = async (key, value) => {
-  await fetch(
+  const r = await fetch(
     `${process.env.UPSTASH_REDIS_REST_URL}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}`,
     { headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` } }
   );
+  if (!r.ok) throw new Error(`Redis write failed: HTTP ${r.status}`);
 };
 
 // ── ABI encode claim(address) call ──────────────────────────────────────
-// keccak256("claim(address)") = 0x1e83409a — first 4 bytes
 function encodeClaimCall(playerAddress) {
   const iface = new ethers.Interface(ONBOARD_ABI);
   return iface.encodeFunctionData('claim', [playerAddress]);
@@ -121,7 +120,7 @@ export default async function handler(req, res) {
     return res.status(409).json({
       error:   'Already claimed',
       claimed: true,
-      message: `Wallet already received onboarding zkLTC.${claimedAt ? ` Claimed ${claimedAt}.` : ''}`,
+      message: `Wallet already received onboarding USDC.${claimedAt ? ` Claimed ${claimedAt}.` : ''}`,
     });
   }
 
@@ -131,10 +130,8 @@ export default async function handler(req, res) {
   const relayerAddr   = relayerWallet.address;
 
   try {
-    // Encode the claim(address) call
     const calldata = encodeClaimCall(address);
 
-    // Fetch nonce, gas price, gas estimate, chainId in parallel
     const [nonceHex, gasPriceHex, gasEstHex, chainIdHex] = await Promise.all([
       rpc('eth_getTransactionCount', [relayerAddr, 'latest']),
       rpc('eth_gasPrice',            []),
@@ -144,13 +141,12 @@ export default async function handler(req, res) {
 
     const nonce    = Number(nonceHex);
     const gasPrice = BigInt(gasPriceHex);
-    const gasLimit = BigInt(gasEstHex) + 10000n; // buffer for contract execution
+    const gasLimit = BigInt(gasEstHex) + 10000n;
     const chainId  = Number(chainIdHex);
 
-    // Sign the contract call transaction
     const signedTx = await relayerWallet.signTransaction({
       to:       contractAddress,
-      value:    0n,            // no ETH sent — contract holds the funds
+      value:    0n,
       data:     calldata,
       nonce,
       gasLimit,
@@ -159,31 +155,34 @@ export default async function handler(req, res) {
       type:     0,
     });
 
-    // Broadcast
     const txHash = await rpc('eth_sendRawTransaction', [signedTx]);
     console.log(`✅ PlayerOnboarded: ${txHash} → ${address}`);
 
-    // Mark claimed in Redis
-    await upstashSet(redisKey, JSON.stringify({
-      txHash,
-      claimedAt: new Date().toISOString(),
-      amount:    CLAIM_AMOUNT_ETH,
-      contract:  contractAddress,
-    }));
+    // Mark claimed in Redis — log warning if this fails but don't error the response
+    try {
+      await upstashSet(redisKey, JSON.stringify({
+        txHash,
+        claimedAt: new Date().toISOString(),
+        amount:    CLAIM_AMOUNT_ETH,
+        contract:  contractAddress,
+      }));
+    } catch (redisErr) {
+      console.error(`⚠️ Redis write failed after successful tx ${txHash}:`, redisErr.message);
+    }
 
     return res.status(200).json({
       success:  true,
       txHash,
       amount:   CLAIM_AMOUNT_ETH,
-      explorer: `https://explorer.arc.network/tx/${txHash}`,
-      message:  `${CLAIM_AMOUNT_ETH} zkLTC sent to your wallet!`,
+      explorer: `https://testnet.arcscan.app/tx/${txHash}`,
+      message:  `${CLAIM_AMOUNT_ETH} USDC sent to your wallet!`,
     });
 
   } catch (err) {
     const msg = err?.message ?? '';
     console.error('Onboard error:', msg);
     if (msg.includes('insufficient') || msg.includes('balance'))
-      return res.status(503).json({ error: 'Contract out of funds. Try the official faucet.', faucet: 'https://faucet.arc.network' });
+      return res.status(503).json({ error: 'Contract out of funds. Try the official faucet.', faucet: 'https://faucet.circle.com' });
     if (msg.includes('nonce'))
       return res.status(503).json({ error: 'Relayer busy — retry in a few seconds.' });
     return res.status(500).json({ error: `Transaction failed: ${msg}` });

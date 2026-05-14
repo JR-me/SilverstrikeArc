@@ -13,8 +13,7 @@ let _id = 1;
 async function rpc(method, params = []) {
   const urls = [
     process.env.RPC_URL,
-    'https://rpc.arc.network',
-    'https://rpc2.arc.network',
+    'https://rpc.testnet.arc.network',
   ].filter(Boolean);
 
   let lastErr;
@@ -35,15 +34,6 @@ async function rpc(method, params = []) {
   throw lastErr;
 }
 
-// Encode a view call and decode the uint256 result
-function encodeCall(sig, address) {
-  const iface = new ethers.Interface([`function ${sig}`]);
-  return iface.encodeFunctionData(sig.split('(')[0], []);
-}
-function decodeUint(hex) {
-  return BigInt(hex);
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -57,7 +47,6 @@ export default async function handler(req, res) {
   try {
     const iface = new ethers.Interface(ONBOARD_ABI);
 
-    // Call claimsRemaining() and totalClaims() on the contract
     const [remainingHex, totalHex, balanceHex, claimAmtHex] = await Promise.all([
       rpc('eth_call', [{ to: contract, data: iface.encodeFunctionData('claimsRemaining') }, 'latest']),
       rpc('eth_call', [{ to: contract, data: iface.encodeFunctionData('totalClaims')     }, 'latest']),
@@ -65,10 +54,10 @@ export default async function handler(req, res) {
       rpc('eth_call', [{ to: contract, data: iface.encodeFunctionData('claimAmount')     }, 'latest']),
     ]);
 
-    const claimsLeft    = Number(iface.decodeFunctionResult('claimsRemaining', remainingHex)[0]);
-    const totalClaims   = Number(iface.decodeFunctionResult('totalClaims',     totalHex)[0]);
-    const balanceZkLTC  = parseFloat(ethers.formatEther(iface.decodeFunctionResult('contractBalance', balanceHex)[0]));
-    const claimAmount   = ethers.formatEther(iface.decodeFunctionResult('claimAmount', claimAmtHex)[0]);
+    const claimsLeft   = Number(iface.decodeFunctionResult('claimsRemaining', remainingHex)[0]);
+    const totalClaims  = Number(iface.decodeFunctionResult('totalClaims',     totalHex)[0]);
+    const balanceZkLTC = parseFloat(ethers.formatEther(iface.decodeFunctionResult('contractBalance', balanceHex)[0]));
+    const claimAmount  = ethers.formatEther(iface.decodeFunctionResult('claimAmount', claimAmtHex)[0]);
 
     return res.status(200).json({
       available:    claimsLeft > 0,
