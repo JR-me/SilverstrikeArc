@@ -8,7 +8,7 @@
 //  Required env vars:
 //    RELAYER_PRIVATE_KEY          relayer wallet private key (0x...)
 //    ONBOARD_CONTRACT_ADDRESS     deployed SilverStrikeOnboarding address
-//    RPC_URL                      https://rpc.liteforge.caldera.xyz/http
+//    RPC_URL                      https://rpc.testnet.arc.network
 //    UPSTASH_REDIS_REST_URL       from upstash.com
 //    UPSTASH_REDIS_REST_TOKEN     from upstash.com
 //    CLAIM_AMOUNT_ETH             display only — actual amount set in contract
