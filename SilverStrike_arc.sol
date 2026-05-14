@@ -7,7 +7,7 @@ interface ISilver {
 
 /**
  * @title SilverStrike
- * @notice On-chain idle clicker game on Arc Testnet (LitVM) — Litecoin's first EVM rollup.
+ * @notice On-chain idle clicker game on Arc Testnet — Circle's stablecoin L1.
  *
  * Audit fixes applied:
  *   M-03  _checkUpgrade() no longer emits Upgraded; upgrade() emits it once
@@ -90,7 +90,7 @@ contract SilverStrike {
     bool    public migrationLocked;
     // M-1: auto-expiry block for the migration window. seedPlayer() and
     //      seedPlayerBatch() revert after this block even if lockMigration()
-    //      was never called. Set to deploy block + 50,000 (~27 hrs on Base).
+    //      was never called. Set to deploy block + 50,000 (~27 hrs on Arc Testnet).
     uint256 public immutable migrationDeadline;
 
     mapping(address => Miner) public miners;
@@ -147,7 +147,7 @@ contract SilverStrike {
         token   = ISilver(token_);
         owner   = owner_;
         _status = _NOT_ENTERED;                               // H-04
-        migrationDeadline = block.number + 50_000;           // M-1: ~27 hrs on Base
+        migrationDeadline = block.number + 50_000;           // M-1: ~27 hrs on Arc Testnet
     }
 
     // ── Ownership (two-step, mirrors Silver pattern) ───────────────────────────

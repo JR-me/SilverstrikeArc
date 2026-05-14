@@ -44,7 +44,7 @@ contract SilverStrikeOnboarding {
         require(_relayer != address(0), "Invalid relayer");
         owner       = msg.sender;
         relayer     = _relayer;
-        claimAmount = 0.01 ether; // 0.01 USDC
+        claimAmount = 10_000; // 0.01 USDC (6 decimals: 10_000 = 0.01 × 10^6)
     }
 
     // ── Core: called by the Vercel relayer ──────────────────────────────────
