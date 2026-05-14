@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="talentapp:project_verification" content="17b2a555571a4d804a6ca94819cde35cfcb892d4477d56f12ef08c1a39de99b207a6ae75a3c68d384c784429b865071fcd5757f760008cde720dc012da72ddb8" />
-<meta property="fc:frame" content='{"version":"next","imageUrl":"https://base-miner-facaster.vercel.app/og-image.png","button":{"title":"⛏ Play SilverStrike","action":{"type":"launch_frame","name":"SilverStrike","url":"https://base-miner-facaster.vercel.app/","splashImageUrl":"https://base-miner-facaster.vercel.app/splash.png","splashBackgroundColor":"#070a14"}}}' />
+<meta property="fc:frame" content='{"version":"next","imageUrl":"https://silverstrike-arc.vercel.app/og-image.png","button":{"title":"⛏ Play SilverStrike","action":{"type":"launch_frame","name":"SilverStrike","url":"https://silverstrike-arc.vercel.app/","splashImageUrl":"https://silverstrike-arc.vercel.app/splash.png","splashBackgroundColor":"#070a14"}}}' />
 <!-- Farcaster Mini App manifest — serve a JSON file at /.well-known/farcaster.json
      on your domain with the same fields for full client support. See:
      https://miniapps.farcaster.xyz/docs/guides/publishing -->
@@ -1096,7 +1096,7 @@
         </div>
         <div class="gas-banner-actions">
           <button id="gas-banner-btn" onclick="doGasClaim()">⛽ Claim Free Gas</button>
-          <a href="https://faucet.arc.network" target="_blank"
+          <a href="https://faucet.circle.com" target="_blank"
              style="font-size:12px;color:var(--text3);text-decoration:underline;white-space:nowrap;">
             Official faucet →
           </a>
@@ -1704,7 +1704,7 @@
                box-shadow:0 2px 0 #505058,0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25);">
         ⛽ Claim 0.01 USDC
       </button>
-      <a href="https://faucet.arc.network" target="_blank"
+      <a href="https://faucet.circle.com" target="_blank"
          style="padding:11px 16px;font-size:13px;color:var(--text2);
                 border:1px solid #303038;border-radius:8px;text-decoration:none;
                 background:#111113;white-space:nowrap;">
@@ -1843,7 +1843,7 @@ const BADGE_ABI = [
 const CHAINS = {
   5042002: {
     name:"Arc", short:"Arc", icon:"⛏️",
-    rpc:"https://rpc.arc.network", explorer:"https://explorer.arc.network",
+    rpc:"https://rpc.testnet.arc.network", explorer:"https://testnet.arcscan.app",
     theme:{ accent:"#d0d0d8",accent2:"#f0f0f4",accentRgb:"208,208,216",
             bg:"#0b0b0d",bg2:"#111113",bg3:"#191919",
             text2:"#a8a8b0",text3:"#585860",glow:"rgba(220,220,228,0.22)" },
@@ -2009,8 +2009,8 @@ async function autoConnectBaseApp() {
             chainId: '0x2105',
             chainName: 'Arc',
             nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://rpc.arc.network'],
-            blockExplorerUrls: ['https://explorer.arc.network'],
+            rpcUrls: ['https://rpc.testnet.arc.network'],
+            blockExplorerUrls: ['https://testnet.arcscan.app'],
           }],
         });
       } else {
@@ -2433,8 +2433,8 @@ async function ensureArc(ethProvider) {
     chainId:  ARC_CHAIN_ID,
     chainName: 'Arc Testnet',
     nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-    rpcUrls:        ['https://rpc.arc.network'],
-    blockExplorerUrls: ['https://explorer.arc.network'],
+    rpcUrls:        ['https://rpc.testnet.arc.network'],
+    blockExplorerUrls: ['https://testnet.arcscan.app'],
   };
 
   const net = await provider.getNetwork();
@@ -3608,8 +3608,8 @@ async function wcmSwitchChain() {
             chainId:  ARC_CHAIN_ID,
             chainName: 'Arc Testnet',
             nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-            rpcUrls:        ['https://rpc.arc.network'],
-            blockExplorerUrls: ['https://explorer.arc.network'],
+            rpcUrls:        ['https://rpc.testnet.arc.network'],
+            blockExplorerUrls: ['https://testnet.arcscan.app'],
           }],
         });
         if (st) st.innerHTML = '<span style="color:var(--green)">✅ Arc added! Switching…</span>';
